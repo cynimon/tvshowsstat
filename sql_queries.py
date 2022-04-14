@@ -28,10 +28,19 @@ change_eps_amount = f'UPDATE series SET episodes = episodes + %s WHERE name = %s
 # изменение статуса сериала
 change_show_stat = f'UPDATE series SET status = %s WHERE name = %s'
 
+# изменение статуса сериала
+to_cancelled = f"UPDATE activity SET status = 'cancelled' WHERE series_id = (SELECT id FROM series WHERE name = %s)"
+
+to_completed = f"UPDATE activity SET status = 'completed' WHERE series_id = %s"
+
 # изменение статуса просмотра мануально
 change_activity_stat = f'UPDATE activity SET status = %s WHERE series_id = (SELECT id FROM series WHERE name = %s)'
 
-# todo: изменение статуса автоматически - через обновление в питоне
+completed_check = '''
+SELECT activity.series_id, activity.episodes as watched, series.episodes as all_eps
+FROM activity JOIN series ON activity.series_id = series.id
+WHERE activity.status = 'watching' AND series.status = false
+'''
 
 # Выборки
 # сколько сериалов смотришь on air

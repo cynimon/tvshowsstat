@@ -17,7 +17,7 @@ def create_connection(db_name, db_user, db_password, db_host, db_port):
 
 
 # исполнение команд
-def execute_query(connection, query, data):
+def execute_query(connection, query, data=None):
     connection.rollback()
     connection.autocommit = True
     cursor = connection.cursor()
@@ -37,6 +37,11 @@ def execute_read_query(connection, query):
         return result
     except psycopg2.OperationalError as e:
         print(f"The error '{e}' occurred")
+
+def read_query(connection, query):
+    result = execute_read_query(connection, query)
+    for c in result:
+        print(*c)
 
 
 def connect():
