@@ -27,11 +27,11 @@ def get_show(n, choice=1):
     elif n == um.change_show_stat:
         df.execute_query(conn, sqql.change_show_stat, (name_show[1], name_show[0]))
     elif n == um.name:
-        df.execute_query(conn, sqql.to_will_watch, name_show[0])
+        df.execute_query(conn, sqql.to_will_watch, (name_show[0],))
     elif choice == 2 and n == um.change_eps:
         df.execute_query(conn, sqql.to_watching, (name_show[0], name_show[1], name_show[0]))
     elif choice == 2 and n == um.name:
-        df.execute_query(conn, sqql.to_cancelled, name_show[0])
+        df.execute_query(conn, sqql.to_cancelled, (name_show[0],))
     elif n == um.eps_watched:
         df.execute_query(conn, sqql.add_episodes, (name_show[1], name_show[0]))
 
@@ -46,27 +46,40 @@ def check_completed():
     for t in temp:
         df.execute_query(conn, sqql.to_completed, t)
 
+
 def stats_amount():
     print('Буду смотреть')
-    df.read_query(conn, sqql.shows_willwatch)
-    print('Смотрю')
-    df.read_query(conn, sqql.shows_watching)
-    print('Полностью посмотрел')
-    df.read_query(conn, sqql.shows_completed)
-    print('Перестал смотреть')
-    df.read_query(conn, sqql.shows_cancelled)
+    result = df.execute_read_query(conn, sqql.shows_willwatch)
+    for r in result:
+        print(*r, end=' | ')
+    print('\nСмотрю')
+    result = df.execute_read_query(conn, sqql.shows_watching)
+    for r in result:
+        print(*r, end=' | ')
+    print('\nПолностью посмотрел')
+    result = df.execute_read_query(conn, sqql.shows_completed)
+    for r in result:
+        print(*r, end=' | ')
+    print('\nПерестал смотреть')
+    result = df.execute_read_query(conn, sqql.shows_cancelled)
+    for r in result:
+        print(*r, end=' | ')
+    print()
     df.read_query(conn, sqql.count_all)
+
 
 def time_amount():
     result = df.execute_read_query(conn, sqql.time_each_show)
+    print('Название', 'Насмотрено', 'Осталось', sep=' | ')
     for r in result:
-        print(result[0], result[1].split(' ')[5:], result[2].split(' ')[5:])
+        print(r[0], str(r[1]), str(r[2]), sep=' | ')
     print('Всего насмотрено: ')
     result = df.execute_read_query(conn, sqql.time_spend)
-    print(result.split(' ')[2:])
+    print(str(result[0][0]))
     print('Всего осталось: ')
     result = df.execute_read_query(conn, sqql.time_left)
-    print(result.split(' ')[2:])
+    print(str(result[0][0]))
+
 
 def genre_amount():
     print('Сериалов по жанрам: ')
@@ -90,6 +103,8 @@ def welcome_manager(choice):
             df.read_query(conn, sqql.non_activity)
             get_show(um.name)
         elif x == 2:
+            print('Выбираем сериал :)')
+            df.read_query(conn, sqql.shows_willwatch)
             get_show(um.change_eps, 2)
         elif x == 3:
             print('Выбираем сериал :)')
@@ -114,3 +129,4 @@ def hello():
     conn = df.connect()
     if conn:
         print('Привет!')
+    return conn

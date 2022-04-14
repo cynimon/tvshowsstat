@@ -38,6 +38,7 @@ def execute_read_query(connection, query):
     except psycopg2.OperationalError as e:
         print(f"The error '{e}' occurred")
 
+
 def read_query(connection, query):
     result = execute_read_query(connection, query)
     for c in result:
