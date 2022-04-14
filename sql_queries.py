@@ -57,7 +57,10 @@ WHERE activity.status = 'watching' AND series.status = false'''
 count_shows_groups = '''
 SELECT status, count(*) FROM activity GROUP BY status
 UNION
-SELECT 'will_watch' as status, count(*) FROM will_watch'''
+SELECT 'will_watch' as status, count(*) FROM will_watch;'''
+
+count_all = '''SELECT 'Всего: ' as status, count(activity.*) + count(will_watch.*) as Количество 
+FROM activity FULL JOIN will_watch ON activity.series_id = will_watch.series_id;'''
 
 # сколько сериалов по жанрам смотришь
 shows_by_genre = '''
@@ -101,5 +104,6 @@ WHERE series.id IN (select series_id from activity) '''
 
 # сколько времени на каждое просмтренное
 time_each_show = '''
-SELECT series.name, justify_interval(activity.episodes * series.length) as time
+SELECT series.name as "Название", justify_interval(activity.episodes * series.length) as "Потраченное время",
+justify_interval((series.episodes - activity.episodes) * series.length) as "Оставшееся время"
 FROM activity JOIN series ON series.id = activity.series_id'''

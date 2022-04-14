@@ -2,6 +2,7 @@ import user_messages as um
 import db_func as df
 import show_classes as sc
 import sql_queries as sqql
+import datetime as dt
 
 
 # добавление нового шоу в базу
@@ -31,7 +32,7 @@ def get_show(n, choice=1):
         df.execute_query(conn, sqql.to_watching, (name_show[0], name_show[1], name_show[0]))
     elif choice == 2 and n == um.name:
         df.execute_query(conn, sqql.to_cancelled, name_show[0])
-    elif choice == 3 and n == um.change_eps:
+    elif n == um.eps_watched:
         df.execute_query(conn, sqql.add_episodes, (name_show[1], name_show[0]))
 
 
@@ -44,6 +45,32 @@ def check_completed():
             temp.append(c[0])
     for t in temp:
         df.execute_query(conn, sqql.to_completed, t)
+
+def stats_amount():
+    print('Буду смотреть')
+    df.read_query(conn, sqql.shows_willwatch)
+    print('Смотрю')
+    df.read_query(conn, sqql.shows_watching)
+    print('Полностью посмотрел')
+    df.read_query(conn, sqql.shows_completed)
+    print('Перестал смотреть')
+    df.read_query(conn, sqql.shows_cancelled)
+    df.read_query(conn, sqql.count_all)
+
+def time_amount():
+    result = df.execute_read_query(conn, sqql.time_each_show)
+    for r in result:
+        print(result[0], result[1].split(' ')[5:], result[2].split(' ')[5:])
+    print('Всего насмотрено: ')
+    result = df.execute_read_query(conn, sqql.time_spend)
+    print(result.split(' ')[2:])
+    print('Всего осталось: ')
+    result = df.execute_read_query(conn, sqql.time_left)
+    print(result.split(' ')[2:])
+
+def genre_amount():
+    print('Сериалов по жанрам: ')
+    df.read_query(conn, sqql.shows_by_genre)
 
 
 # управление основными функциями приложения
@@ -71,15 +98,15 @@ def welcome_manager(choice):
         elif x == 4:
             print('Выбираем сериал :)')
             df.read_query(conn, sqql.shows_watching)
-            get_show(um.change_eps, 3)
+            get_show(um.eps_watched)
             check_completed()
     elif choice == 3:
         if x == 1:
-            pass
+            stats_amount()
         elif x == 2:
-            pass
+            time_amount()
         elif x == 3:
-            pass
+            genre_amount()
 
 
 def hello():
