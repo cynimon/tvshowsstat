@@ -1,6 +1,6 @@
 # Добавление
 insert_new_episodes = '''INSERT INTO series(name, episodes, length, start_year, end_year, genre_id, status)
-    VALUES (%s, %s, %s, %s, %s, (SELECT id FROM genre WHERE name=%s), %s)'''
+    VALUES (%s, %s,  %s, to_date(%s, 'YYYY-01-01'), to_date(%s, 'YYYY-01-01'), %s, %s)'''
 
 to_will_watch = (
     f'INSERT INTO will_watch(series_id) (SELECT id FROM series WHERE name = %s)'

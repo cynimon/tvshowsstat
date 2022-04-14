@@ -1,5 +1,6 @@
 import psycopg2
 
+
 def create_connection(db_name, db_user, db_password, db_host, db_port):
     connection = None
     try:
@@ -10,21 +11,36 @@ def create_connection(db_name, db_user, db_password, db_host, db_port):
             host=db_host,
             port=db_port,
         )
-        print("Connection to PostgreSQL DB successful")
     except psycopg2.OperationalError as e:
         print(f"The error '{e}' occurred")
     return connection
 
 
-connection = create_connection(
-    "myshows", "postgres", "11qa", "127.0.0.1", "5432"
-)
-
-def execute_query(connection, query):
+# исполнение команд
+def execute_query(connection, query, data):
+    connection.rollback()
     connection.autocommit = True
     cursor = connection.cursor()
     try:
-        cursor.execute(query)
-        print("Query executed successfully")
+        cursor.execute(query, data)
+        print('Успешно!')
     except psycopg2.OperationalError as e:
         print(f"The error '{e}' occurred")
+
+
+# чтение выборки данных
+def execute_read_query(connection, query):
+    cursor = connection.cursor()
+    try:
+        cursor.execute(query)
+        result = cursor.fetchall()
+        return result
+    except psycopg2.OperationalError as e:
+        print(f"The error '{e}' occurred")
+
+
+def connect():
+    x = create_connection(
+        "myshows", "postgres", "11qa", "127.0.0.1", "5432"
+    )
+    return x
